@@ -1,17 +1,9 @@
 #!/usr/bin/env python3
-"""Task 1: Simple pagination.
 """
-
+Adds `get_page` method to `Server` class
+"""
 import csv
-import math
 from typing import List, Tuple
-
-
-def index_range(page: int, page_size: int) -> Tuple[int, int]:
-    """Retrieves the index range from a given page and page size.
-    """
-
-    return ((page - 1) * page_size, ((page - 1) * page_size) + page_size)
 
 
 class Server:
@@ -29,17 +21,28 @@ class Server:
             with open(self.DATA_FILE) as f:
                 reader = csv.reader(f)
                 dataset = [row for row in reader]
-                self.__dataset = dataset[1:]
+            self.__dataset = dataset[1:]
 
-                return self.__dataset
+        return self.__dataset
+
+    @staticmethod
+    def index_range(page: int, page_size: int) -> Tuple[int, int]:
+        """Calculate start and end index range for a `page`, with `page_size`
+        """
+        nextPageStartIndex = page * page_size
+        return nextPageStartIndex - page_size, nextPageStartIndex
 
     def get_page(self, page: int = 1, page_size: int = 10) -> List[List]:
-        """Retrieves a page of data.
+        """
+        Get items for the given page number
+        Args:
+            page (int): page number
+            page_size (int): number of items per page
+        Returns:
+            (List[List]): a list of list(row) if inputs are within range
+            ([]) : an empty list if page and page_size are out of range
         """
         assert type(page) == int and type(page_size) == int
         assert page > 0 and page_size > 0
-        start, end = index_range(page, page_size)
-        data = self.dataset()
-        if start > len(data):
-            return []
-        return data[start:end]
+        startIndex, endIndex = self.index_range(page, page_size)
+        return self.dataset()[startIndex:endIndex]
